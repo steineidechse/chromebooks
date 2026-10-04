@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Chromebooks ausleihen</title>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #202124;
+      --muted: #6b7280;
+      --border: #e3e7ee;
+      --primary: #1a73e8;
+      --primary-dark: #1558b0;
+      --success-bg: #e6f4ea;
+      --success: #137333;
+      --warning-bg: #fef7e0;
+      --warning: #b06000;
+      --danger-bg: #fce8e6;
+      --danger: #c5221f;
+      --shadow: 0 2px 10px rgba(0,0,0,.07);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 32px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    .login-card h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    .login-card p {
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    .primary-button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      padding: 12px 18px;
+      font-weight: 700;
+    }
+
+    .primary-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .login-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 1450px;
+      margin: auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-icon {
+      font-size: 28px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    main {
+      max-width: 1450px;
+      margin: auto;
+      padding: 22px 20px 50px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .week-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .secondary-button {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 12px;
+      color: var(--text);
+    }
+
+    .secondary-button:hover {
+      background: #f1f3f4;
+    }
+
+    #weekLabel {
+      font-weight: 700;
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .week-grid-wrapper {
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .week-grid {
+      display: grid;
+      gap: 8px;
+      min-width: 900px;
+    }
+
+    .grid-header {
+      background: white;
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 700;
+      border: 1px solid var(--border);
+    }
+
+    .grid-header.today {
+      border: 2px solid var(--primary);
+    }
+
+    .day-date {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .lesson-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      font-weight: 700;
+      color: var(--muted);
+      min-height: 76px;
+    }
+
+    .slot {
+      min-height: 76px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 10px;
+      padding: 8px;
+      transition: .15s;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .slot:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .slot-completely-free {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .full-availability {
+      color: var(--success);
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .partial-availability {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      margin: 1px 0 7px;
+    }
+
+    .partial-availability.good {
+      color: var(--success);
+    }
+
+    .partial-availability.medium {
+      color: var(--warning);
+    }
+
+    .partial-availability.low {
+      color: var(--danger);
+    }
+
+    .partial-availability.booked-out {
+      color: var(--danger);
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    .booking-chip.own {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 7px;
+      padding: 5px 6px;
+      margin-top: 4px;
+      text-align: left;
+      background: #e8f0fe;
+      color: #174ea6;
+      font-size: 12px;
+      line-height: 1.25;
+      cursor: pointer;
+    }
+
+    .booking-chip.own:hover {
+      background: #d2e3fc;
+    }
+
+    .booking-chip.other {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 7px;
+      padding: 5px 6px;
+      margin-top: 4px;
+      text-align: left;
+      background: #f1f3f4;
+      color: #5f6368;
+      font-size: 12px;
+      line-height: 1.25;
+      cursor: default;
+    }
+
+    .more-lessons-row {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      padding: 4px 0 2px;
+    }
+
+    .more-lessons-button {
+      width: min(500px, 100%);
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-weight: 700;
+    }
+
+    .more-lessons-button:hover {
+      background: #f1f3f4;
+      color: var(--text);
+    }
+
+    #mobileView {
+      display: none;
+    }
+
+    .day-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .day-card-header {
+      padding: 14px 16px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-card-header.today {
+      background: #e8f0fe;
+      color: #174ea6;
+    }
+
+    .mobile-slot {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .mobile-slot:last-child {
+      border-bottom: 0;
+    }
+
+    .mobile-slot-top {
+      display: grid;
+      grid-template-columns: 90px 1fr 90px;
+      align-items: center;
+      min-height: 42px;
+      gap: 8px;
+    }
+
+    .mobile-full-number {
+      grid-column: 2;
+      text-align: center;
+      color: var(--success);
+      font-size: 27px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .mobile-availability {
+      grid-column: 2;
+      text-align: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .mobile-availability.good {
+      color: var(--success);
+    }
+
+    .mobile-availability.medium {
+      color: var(--warning);
+    }
+
+    .mobile-availability.low {
+      color: var(--danger);
+    }
+
+    .mobile-bookings {
+      margin-top: 5px;
+      padding-left: 98px;
+    }
+
+    .mobile-more-lessons {
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .mobile-more-lessons button {
+      width: 100%;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: white;
+      width: min(560px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.22);
+    }
+
+    .modal-header {
+      padding: 20px 22px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .close-button {
+      border: 0;
+      background: transparent;
+      font-size: 26px;
+      line-height: 1;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      padding: 10px 22px 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      border: 1px solid #cfd5df;
+      border-radius: 9px;
+      padding: 11px 12px;
+      background: white;
+    }
+
+    .lesson-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .lesson-button {
+      width: 43px;
+      height: 43px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: white;
+      font-weight: 700;
+    }
+
+    .lesson-button.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .availability-box {
+      border-radius: 9px;
+      padding: 11px 12px;
+      margin: 4px 0 16px;
+      font-size: 14px;
+    }
+
+    .availability-box.good {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .availability-box.bad {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .actions-right {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .danger-button {
+      border: 0;
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 10px 13px;
+      border-radius: 9px;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 300;
+      background: #202124;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      max-width: 360px;
+    }
+
+    .error-text {
+      color: var(--danger);
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.72);
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    @media (max-width:750px) {
+      main {
+        padding: 16px 12px 40px;
+      }
+
+      .header-inner {
+        padding: 12px 14px;
+      }
+
+      .title h1 {
+        font-size: 19px;
+      }
+
+      #desktopView {
+        display: none;
+      }
+
+      #mobileView {
+        display: block;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .week-nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      #weekLabel {
+        order: -1;
+        width: 100%;
+        margin-bottom: 3px;
+      }
+
+      #newReservationButton {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<section id="loginScreen">
+  <div class="login-card">
+    <div class="logo">💻</div>
+    <h1>Chromebooks ausleihen</h1>
+    <p>Bitte einmal den schulinternen PIN eingeben.</p>
+
+    <input
+      id="pinInput"
+      class="pin-input"
+      type="password"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="PIN"
+    >
+
+    <button
+      class="primary-button login-button"
+      onclick="login()"
+    >
+      Öffnen
+    </button>
+
+    <div id="loginError" class="error-text"></div>
+  </div>
+</section>
+
+
+<section id="app" class="hidden">
+
+<header>
+  <div class="header-inner">
+
+    <div class="title">
+      <div class="title-icon">💻</div>
+
+      <div>
+        <h1>Chromebooks ausleihen</h1>
+        <div class="subtitle" id="deviceSubtitle"></div>
+      </div>
+    </div>
+
+    <button
+      class="secondary-button"
+      onclick="forgetPin()"
+      title="PIN auf diesem Gerät vergessen"
+    >
+      Abmelden
+    </button>
+
+  </div>
+</header>
+
+
+<main>
+
+<div class="toolbar">
+
+  <div class="week-nav">
+
+    <button
+      class="secondary-button"
+      onclick="changeWeek(-1)"
+    >
+      ‹ Vorherige Woche
+    </button>
+
+    <span id="weekLabel"></span>
+
+    <button
+      class="secondary-button"
+      onclick="goToCurrentWeek()"
+    >
+      Diese Woche
+    </button>
+
+    <button
+      class="secondary-button"
+      onclick="changeWeek(1)"
+    >
+      Nächste Woche ›
+    </button>
+
+  </div>
+
+  <button
+    id="newReservationButton"
+    class="primary-button"
+    onclick="openNewReservation()"
+  >
+    + Reservierung
+  </button>
+
+</div>
+
+
+<div id="desktopView" class="week-grid-wrapper">
+  <div id="weekGrid" class="week-grid"></div>
+</div>
+
+<div id="mobileView"></div>
+
+</main>
+</section>
+
+
+<div id="reservationModal" class="modal-backdrop hidden">
+
+  <div class="modal">
+
+    <div class="modal-header">
+      <h2 id="modalTitle">Reservierung</h2>
+      <button class="close-button" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <input id="reservationId" type="hidden">
+
+      <div class="form-group">
+        <label for="teacherSelect">Lehrkraft</label>
+        <select id="teacherSelect" class="form-control"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="classSelect">Klasse</label>
+        <select id="classSelect" class="form-control"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="dateInput">Datum</label>
+        <input
+          id="dateInput"
+          class="form-control"
+          type="date"
+          onchange="updateAvailabilityMessage()"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Stunde(n)</label>
+        <div id="lessonButtons" class="lesson-buttons"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="quantityInput">Anzahl Chromebooks</label>
+        <input
+          id="quantityInput"
+          class="form-control"
+          type="number"
+          min="1"
+          step="1"
+          oninput="updateAvailabilityMessage()"
+        >
+      </div>
+
+      <div
+        id="availabilityMessage"
+        class="availability-box good"
+      ></div>
+
+      <div class="modal-actions">
+
+        <button
+          id="deleteButton"
+          class="danger-button hidden"
+          onclick="deleteCurrentReservation()"
+        >
+          Löschen
+        </button>
+
+        <div class="actions-right">
+
+          <button
+            class="secondary-button"
+            onclick="closeModal()"
+          >
+            Abbrechen
+          </button>
+
+          <button
+            class="primary-button"
+            onclick="saveCurrentReservation()"
+          >
+            Speichern
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div id="loading" class="loading hidden">
+  Einen Moment …
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+
+<script>
+
+const API_URL =
+  'https://chromebooks-api.school8usiness.workers.dev/';
+
+let PIN = '';
+
+let appData = {
+  teachers: [],
+  classes: [],
+  lessons: [],
+  totalDevices: 0,
+  reservations: []
+};
+
+let weekOffset = 0;
+let selectedLessons = [];
+let showLateLessons = false;
+
+
+/* =========================================================
+   API
+   ========================================================= */
+
+async function apiCall(action, payload = {}) {
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+
+    body: JSON.stringify({
+      action: action,
+      pin: PIN,
+      ...payload
+    })
+  });
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error(
+      'Die Serverantwort konnte nicht gelesen werden.'
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      result.error || 'Serverfehler.'
+    );
+  }
+
+  if (!result.success) {
+    throw new Error(
+      result.error || 'Unbekannter Fehler.'
+    );
+  }
+
+  return result.data;
+}
+
+
+/* =========================================================
+   START / LOGIN
+   ========================================================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const savedPin =
+    localStorage.getItem('cbAppPin');
+
+  document
+    .getElementById('pinInput')
+    .addEventListener('keydown', event => {
+
+      if (event.key === 'Enter') {
+        login();
+      }
+
+    });
+
+  if (savedPin) {
+    PIN = savedPin;
+    loadInitialData(true);
+  }
+
+});
+
+
+function login() {
+
+  const pin =
+    document.getElementById('pinInput')
+      .value
+      .trim();
+
+  if (!pin) {
+
+    document.getElementById('loginError')
+      .textContent = 'Bitte PIN eingeben.';
+
+    return;
+  }
+
+  PIN = pin;
+
+  loadInitialData(false);
+}
+
+
+async function loadInitialData(autoLogin) {
+
+  setLoading(true);
+
+  try {
+
+    const data =
+      await apiCall('initialData');
+
+    appData = data;
+
+    localStorage.setItem(
+      'cbAppPin',
+      PIN
+    );
+
+    document
+      .getElementById('loginScreen')
+      .classList.add('hidden');
+
+    document
+      .getElementById('app')
+      .classList.remove('hidden');
+
+    document
+      .getElementById('loginError')
+      .textContent = '';
+
+    document
+      .getElementById('deviceSubtitle')
+      .textContent =
+        `${appData.totalDevices} Geräte insgesamt`;
+
+    buildFormOptions();
+
+    goToCurrentWeek();
+
+  } catch (error) {
+
+    if (autoLogin) {
+      localStorage.removeItem('cbAppPin');
+    }
+
+    PIN = '';
+
+    document
+      .getElementById('loginScreen')
+      .classList.remove('hidden');
+
+    document
+      .getElementById('app')
+      .classList.add('hidden');
+
+    document
+      .getElementById('loginError')
+      .textContent =
+        readableError(error);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+}
+
+
+function forgetPin() {
+
+  localStorage.removeItem('cbAppPin');
+
+  PIN = '';
+
+  document
+    .getElementById('app')
+    .classList.add('hidden');
+
+  document
+    .getElementById('loginScreen')
+    .classList.remove('hidden');
+
+  document
+    .getElementById('pinInput')
+    .value = '';
+
+}
+
+
+/* =========================================================
+   EIGENE RESERVIERUNGEN
+   ========================================================= */
+
+function getCurrentTeacher() {
+
+  return localStorage.getItem('cbTeacher') || '';
+
+}
+
+
+function isOwnReservation(reservation) {
+
+  const currentTeacher =
+    getCurrentTeacher();
+
+  return (
+    currentTeacher &&
+    reservation.teacher === currentTeacher
+  );
+
+}
+
+
+/* =========================================================
+   WOCHENANSICHT
+   ========================================================= */
+
+function goToCurrentWeek() {
+
+  weekOffset = 0;
+  renderWeek();
+
+}
+
+
+function changeWeek(direction) {
+
+  weekOffset += direction;
+  renderWeek();
+
+}
+
+
+function toggleLateLessons() {
+
+  showLateLessons =
+    !showLateLessons;
+
+  renderWeek();
+
+}
+
+
+function getMainLessons() {
+
+  return appData.lessons.filter(
+    lesson => Number(lesson) <= 6
+  );
+
+}
+
+
+function getLateLessons() {
+
+  return appData.lessons.filter(
+    lesson => Number(lesson) >= 7
+  );
+
+}
+
+
+function renderWeek() {
+
+  const days =
+    getVisibleWeekDays();
+
+  renderWeekLabel(days);
+  renderDesktop(days);
+  renderMobile(days);
+
+}
+
+
+function getVisibleWeekDays() {
+
+  const today =
+    startOfDay(new Date());
+
+  const currentMonday =
+    getMonday(today);
+
+  const monday =
+    new Date(currentMonday);
+
+  monday.setDate(
+    monday.getDate() +
+    (weekOffset * 7)
+  );
+
+  const days = [];
+
+  for (let i = 0; i < 5; i++) {
+
+    const date =
+      new Date(monday);
+
+    date.setDate(
+      monday.getDate() + i
+    );
+
+    if (
+      weekOffset === 0 &&
+      today.getDay() >= 1 &&
+      today.getDay() <= 5 &&
+      date < today
+    ) {
+      continue;
+    }
+
+    days.push(date);
+  }
+
+  if (
+    weekOffset === 0 &&
+    (
+      today.getDay() === 0 ||
+      today.getDay() === 6
+    )
+  ) {
+
+    days.length = 0;
+
+    const nextMonday =
+      new Date(currentMonday);
+
+    nextMonday.setDate(
+      nextMonday.getDate() + 7
+    );
+
+    for (let i = 0; i < 5; i++) {
+
+      const date =
+        new Date(nextMonday);
+
+      date.setDate(
+        nextMonday.getDate() + i
+      );
+
+      days.push(date);
+
+    }
+  }
+
+  return days;
+}
+
+
+function renderWeekLabel(days) {
+
+  if (!days.length) return;
+
+  document
+    .getElementById('weekLabel')
+    .textContent =
+      `${formatShortDate(days[0])} – ${formatShortDate(days[days.length - 1])}`;
+
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+function renderDesktop(days) {
+
+  const grid =
+    document.getElementById('weekGrid');
+
+  grid.innerHTML = '';
+
+  grid.style.gridTemplateColumns =
+    `70px repeat(${days.length}, minmax(160px, 1fr))`;
+
+  grid.appendChild(
+    document.createElement('div')
+  );
+
+  days.forEach(day => {
+
+    const header =
+      document.createElement('div');
+
+    header.className =
+      'grid-header' +
+      (isToday(day) ? ' today' : '');
+
+    header.innerHTML =
+      `${weekdayName(day)}
+       <span class="day-date">
+         ${formatShortDate(day)}
+       </span>`;
+
+    grid.appendChild(header);
+
+  });
+
+
+  getMainLessons().forEach(
+    lesson =>
+      appendDesktopLessonRow(
+        grid,
+        days,
+        lesson
+      )
+  );
+
+
+  if (getLateLessons().length) {
+
+    const toggleRow =
+      document.createElement('div');
+
+    toggleRow.className =
+      'more-lessons-row';
+
+    const button =
+      document.createElement('button');
+
+    button.className =
+      'more-lessons-button';
+
+    button.textContent =
+      showLateLessons
+        ? '▴ Stunden 7–10 ausblenden'
+        : '▾ Stunden 7–10 anzeigen';
+
+    button.onclick =
+      toggleLateLessons;
+
+    toggleRow.appendChild(button);
+    grid.appendChild(toggleRow);
+
+  }
+
+
+  if (showLateLessons) {
+
+    getLateLessons().forEach(
+      lesson =>
+        appendDesktopLessonRow(
+          grid,
+          days,
+          lesson
+        )
+    );
+
+  }
+}
+
+
+function appendDesktopLessonRow(
+  grid,
+  days,
+  lesson
+) {
+
+  const label =
+    document.createElement('div');
+
+  label.className =
+    'lesson-label';
+
+  label.textContent =
+    `${lesson}.`;
+
+  grid.appendChild(label);
+
+  days.forEach(day => {
+
+    grid.appendChild(
+      buildDesktopSlot(
+        day,
+        lesson
+      )
+    );
+
+  });
+
+}
+
+
+function buildDesktopSlot(
+  day,
+  lesson
+) {
+
+  const dateString =
+    toDateString(day);
+
+  const bookings =
+    reservationsFor(
+      dateString,
+      lesson
+    );
+
+  const available =
+    availableDevices(
+      dateString,
+      lesson
+    );
+
+  const slot =
+    document.createElement('div');
+
+  slot.className = 'slot';
+
+
+  if (
+    available === appData.totalDevices &&
+    bookings.length === 0
+  ) {
+
+    slot.classList.add(
+      'slot-completely-free'
+    );
+
+    const number =
+      document.createElement('div');
+
+    number.className =
+      'full-availability';
+
+    number.textContent =
+      available;
+
+    slot.appendChild(number);
+
+  } else {
+
+    const availability =
+      document.createElement('div');
+
+    if (available <= 0) {
+
+      availability.className =
+        'partial-availability booked-out';
+
+      availability.textContent =
+        'belegt';
+
+    } else {
+
+      availability.className =
+        `partial-availability ${availabilityClass(available)}`;
+
+      availability.textContent =
+        `${available} frei`;
+
+    }
+
+    slot.appendChild(
+      availability
+    );
+
+
+    bookings.forEach(booking => {
+
+      const chip =
+        document.createElement('button');
+
+      const own =
+        isOwnReservation(booking);
+
+      chip.className =
+        `booking-chip ${own ? 'own' : 'other'}`;
+
+      chip.textContent =
+        `${booking.className} · ${booking.teacher} · ${booking.quantity}`;
+
+      if (own) {
+
+        chip.title =
+          'Eigene Reservierung bearbeiten';
+
+        chip.onclick = event => {
+
+          event.stopPropagation();
+
+          openEditReservation(
+            booking.id
+          );
+
+        };
+
+      } else {
+
+        chip.title =
+          'Reservierung einer anderen Lehrkraft';
+
+        chip.onclick = event => {
+          event.stopPropagation();
+        };
+
+      }
+
+      slot.appendChild(chip);
+
+    });
+
+  }
+
+
+  slot.onclick =
+    () =>
+      openNewReservation(
+        dateString,
+        lesson
+      );
+
+  return slot;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+function renderMobile(days) {
+
+  const container =
+    document.getElementById(
+      'mobileView'
+    );
+
+  container.innerHTML = '';
+
+
+  days.forEach(day => {
+
+    const dateString =
+      toDateString(day);
+
+    const card =
+      document.createElement('div');
+
+    card.className =
+      'day-card';
+
+
+    const header =
+      document.createElement('div');
+
+    header.className =
+      'day-card-header' +
+      (isToday(day) ? ' today' : '');
+
+    header.textContent =
+      `${weekdayName(day)} · ${formatShortDate(day)}`;
+
+    card.appendChild(header);
+
+
+    getMainLessons().forEach(
+      lesson =>
+        card.appendChild(
+          buildMobileSlot(
+            dateString,
+            lesson
+          )
+        )
+    );
+
+
+    if (showLateLessons) {
+
+      getLateLessons().forEach(
+        lesson =>
+          card.appendChild(
+            buildMobileSlot(
+              dateString,
+              lesson
+            )
+          )
+      );
+
+    }
+
+
+    container.appendChild(card);
+
+  });
+
+
+  if (getLateLessons().length) {
+
+    const toggle =
+      document.createElement('div');
+
+    toggle.className =
+      'mobile-more-lessons';
+
+    const button =
+      document.createElement('button');
+
+    button.className =
+      'more-lessons-button';
+
+    button.textContent =
+      showLateLessons
+        ? '▴ Stunden 7–10 ausblenden'
+        : '▾ Stunden 7–10 anzeigen';
+
+    button.onclick =
+      toggleLateLessons;
+
+    toggle.appendChild(button);
+
+    container.appendChild(toggle);
+
+  }
+}
+
+
+function buildMobileSlot(
+  dateString,
+  lesson
+) {
+
+  const bookings =
+    reservationsFor(
+      dateString,
+      lesson
+    );
+
+  const available =
+    availableDevices(
+      dateString,
+      lesson
+    );
+
+  const slot =
+    document.createElement('div');
+
+  slot.className =
+    'mobile-slot';
+
+
+  const top =
+    document.createElement('div');
+
+  top.className =
+    'mobile-slot-top';
+
+
+  const lessonLabel =
+    document.createElement('strong');
+
+  lessonLabel.textContent =
+    `${lesson}. Stunde`;
+
+  top.appendChild(
+    lessonLabel
+  );
+
+
+  if (
+    available === appData.totalDevices &&
+    bookings.length === 0
+  ) {
+
+    const number =
+      document.createElement('div');
+
+    number.className =
+      'mobile-full-number';
+
+    number.textContent =
+      available;
+
+    top.appendChild(number);
+
+  } else {
+
+    const availability =
+      document.createElement('div');
+
+    availability.className =
+      `mobile-availability ${availabilityClass(available)}`;
+
+    availability.textContent =
+      available <= 0
+        ? 'belegt'
+        : `${available} frei`;
+
+    top.appendChild(
+      availability
+    );
+
+  }
+
+
+  top.onclick =
+    () =>
+      openNewReservation(
+        dateString,
+        lesson
+      );
+
+  slot.appendChild(top);
+
+
+  if (bookings.length) {
+
+    const bookingContainer =
+      document.createElement('div');
+
+    bookingContainer.className =
+      'mobile-bookings';
+
+
+    bookings.forEach(booking => {
+
+      const chip =
+        document.createElement('button');
+
+      const own =
+        isOwnReservation(booking);
+
+      chip.className =
+        `booking-chip ${own ? 'own' : 'other'}`;
+
+      chip.textContent =
+        `${booking.className} · ${booking.teacher} · ${booking.quantity} Geräte`;
+
+
+      if (own) {
+
+        chip.title =
+          'Eigene Reservierung bearbeiten';
+
+        chip.onclick = event => {
+
+          event.stopPropagation();
+
+          openEditReservation(
+            booking.id
+          );
+
+        };
+
+      } else {
+
+        chip.title =
+          'Reservierung einer anderen Lehrkraft';
+
+        chip.onclick = event => {
+          event.stopPropagation();
+        };
+
+      }
+
+
+      bookingContainer.appendChild(
+        chip
+      );
+
+    });
+
+
+    slot.appendChild(
+      bookingContainer
+    );
+
+  }
+
+
+  return slot;
+}
+
+
+/* =========================================================
+   RESERVIERUNGSDATEN
+   ========================================================= */
+
+function reservationsFor(
+  dateString,
+  lesson
+) {
+
+  return appData.reservations.filter(
+    reservation =>
+      reservation.date === dateString &&
+      reservation.lessons.includes(
+        Number(lesson)
+      )
+  );
+
+}
+
+
+function availableDevices(
+  dateString,
+  lesson,
+  excludeId = null
+) {
+
+  const booked =
+    appData.reservations
+      .filter(
+        reservation =>
+          reservation.id !== excludeId &&
+          reservation.date === dateString &&
+          reservation.lessons.includes(
+            Number(lesson)
+          )
+      )
+      .reduce(
+        (sum, reservation) =>
+          sum +
+          Number(reservation.quantity),
+        0
+      );
+
+  return (
+    appData.totalDevices -
+    booked
+  );
+}
+
+
+/* =========================================================
+   MODAL / NEUE RESERVIERUNG
+   ========================================================= */
+
+function openNewReservation(
+  dateString = '',
+  lesson = null
+) {
+
+  document
+    .getElementById('modalTitle')
+    .textContent =
+      'Neue Reservierung';
+
+  document
+    .getElementById('reservationId')
+    .value = '';
+
+  document
+    .getElementById('deleteButton')
+    .classList.add('hidden');
+
+
+  const rememberedTeacher =
+    getCurrentTeacher();
+
+  document
+    .getElementById('teacherSelect')
+    .value =
+      appData.teachers.includes(
+        rememberedTeacher
+      )
+        ? rememberedTeacher
+        : '';
+
+
+  document
+    .getElementById('classSelect')
+    .value = '';
+
+  document
+    .getElementById('dateInput')
+    .value =
+      dateString ||
+      toDateString(new Date());
+
+  document
+    .getElementById('quantityInput')
+    .value = '';
+
+
+  selectedLessons =
+    lesson !== null
+      ? [Number(lesson)]
+      : [];
+
+
+  renderLessonButtons();
+  updateAvailabilityMessage();
+
+
+  document
+    .getElementById('reservationModal')
+    .classList.remove('hidden');
+
+}
+
+
+/* =========================================================
+   RESERVIERUNG BEARBEITEN
+   ========================================================= */
+
+function openEditReservation(id) {
+
+  const reservation =
+    appData.reservations.find(
+      item => item.id === id
+    );
+
+
+  if (!reservation) {
+
+    showToast(
+      'Reservierung nicht gefunden.'
+    );
+
+    return;
+  }
+
+
+  if (!isOwnReservation(reservation)) {
+
+    showToast(
+      'Diese Reservierung gehört einer anderen Lehrkraft.'
+    );
+
+    return;
+  }
+
+
+  document
+    .getElementById('modalTitle')
+    .textContent =
+      'Reservierung bearbeiten';
+
+  document
+    .getElementById('reservationId')
+    .value =
+      reservation.id;
+
+  document
+    .getElementById('teacherSelect')
+    .value =
+      reservation.teacher;
+
+  document
+    .getElementById('classSelect')
+    .value =
+      reservation.className;
+
+  document
+    .getElementById('dateInput')
+    .value =
+      reservation.date;
+
+  document
+    .getElementById('quantityInput')
+    .value =
+      reservation.quantity;
+
+
+  selectedLessons =
+    [...reservation.lessons];
+
+
+  document
+    .getElementById('deleteButton')
+    .classList.remove('hidden');
+
+
+  renderLessonButtons();
+  updateAvailabilityMessage();
+
+
+  document
+    .getElementById('reservationModal')
+    .classList.remove('hidden');
+
+}
+
+
+function closeModal() {
+
+  document
+    .getElementById('reservationModal')
+    .classList.add('hidden');
+
+}
+
+
+/* =========================================================
+   SPEICHERN
+   ========================================================= */
+
+async function saveCurrentReservation() {
+
+  const data = {
+
+    id:
+      document
+        .getElementById('reservationId')
+        .value || null,
+
+    teacher:
+      document
+        .getElementById('teacherSelect')
+        .value,
+
+    className:
+      document
+        .getElementById('classSelect')
+        .value,
+
+    date:
+      document
+        .getElementById('dateInput')
+        .value,
+
+    lessons:
+      [...selectedLessons],
+
+    quantity:
+      Number(
+        document
+          .getElementById('quantityInput')
+          .value
+      )
+
+  };
+
+
+  if (!data.teacher) {
+
+    showToast(
+      'Bitte Lehrkraft auswählen.'
+    );
+
+    return;
+  }
+
+
+  if (!data.className) {
+
+    showToast(
+      'Bitte Klasse auswählen.'
+    );
+
+    return;
+  }
+
+
+  if (!data.date) {
+
+    showToast(
+      'Bitte Datum auswählen.'
+    );
+
+    return;
+  }
+
+
+  if (!data.lessons.length) {
+
+    showToast(
+      'Bitte mindestens eine Stunde auswählen.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !Number.isInteger(data.quantity) ||
+    data.quantity < 1
+  ) {
+
+    showToast(
+      'Bitte eine gültige Gerätezahl eingeben.'
+    );
+
+    return;
+  }
+
+
+  const problems =
+    localAvailabilityProblems(data);
+
+
+  if (problems.length) {
+
+    showToast(
+      problems
+        .map(
+          problem =>
+            `${problem.lesson}. Stunde: nur ${problem.available} frei`
+        )
+        .join(' · ')
+    );
+
+    return;
+  }
+
+
+  localStorage.setItem(
+    'cbTeacher',
+    data.teacher
+  );
+
+
+  setLoading(true);
+
+
+  try {
+
+    const result =
+      await apiCall(
+        'saveReservation',
+        { data: data }
+      );
+
+
+    closeModal();
+
+    await refreshData();
+
+    showToast(
+      result.message
+    );
+
+  } catch (error) {
+
+    showToast(
+      readableError(error)
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+}
+
+
+/* =========================================================
+   LÖSCHEN
+   ========================================================= */
+
+async function deleteCurrentReservation() {
+
+  const id =
+    document
+      .getElementById('reservationId')
+      .value;
+
+
+  if (!id) return;
+
+
+  const reservation =
+    appData.reservations.find(
+      item => item.id === id
+    );
+
+
+  if (
+    !reservation ||
+    !isOwnReservation(reservation)
+  ) {
+
+    showToast(
+      'Diese Reservierung kann hier nicht gelöscht werden.'
+    );
+
+    return;
+  }
+
+
+  if (
+    !confirm(
+      'Diese Reservierung wirklich löschen?'
+    )
+  ) {
+    return;
+  }
+
+
+  setLoading(true);
+
+
+  try {
+
+    const result =
+      await apiCall(
+        'deleteReservation',
+        { id: id }
+      );
+
+
+    closeModal();
+
+    await refreshData();
+
+    showToast(
+      result.message
+    );
+
+  } catch (error) {
+
+    showToast(
+      readableError(error)
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+}
+
+
+/* =========================================================
+   AKTUALISIEREN
+   ========================================================= */
+
+async function refreshData() {
+
+  const data =
+    await apiCall(
+      'refreshReservations'
+    );
+
+  appData.totalDevices =
+    data.totalDevices;
+
+  appData.reservations =
+    data.reservations;
+
+  renderWeek();
+
+}
+
+
+/* =========================================================
+   FORMULAR
+   ========================================================= */
+
+function buildFormOptions() {
+
+  const teacherSelect =
+    document.getElementById(
+      'teacherSelect'
+    );
+
+  teacherSelect.innerHTML =
+    '<option value="">Bitte auswählen …</option>';
+
+
+  appData.teachers.forEach(
+    teacher => {
+
+      const option =
+        document.createElement(
+          'option'
+        );
+
+      option.value =
+        teacher;
+
+      option.textContent =
+        teacher;
+
+      teacherSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  const classSelect =
+    document.getElementById(
+      'classSelect'
+    );
+
+  classSelect.innerHTML =
+    '<option value="">Bitte auswählen …</option>';
+
+
+  appData.classes.forEach(
+    item => {
+
+      const option =
+        document.createElement(
+          'option'
+        );
+
+      option.value =
+        item.value;
+
+      option.textContent =
+        item.label;
+
+      classSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  renderLessonButtons();
+
+}
+
+
+function renderLessonButtons() {
+
+  const container =
+    document.getElementById(
+      'lessonButtons'
+    );
+
+  container.innerHTML = '';
+
+
+  appData.lessons.forEach(
+    lesson => {
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+      button.type =
+        'button';
+
+      button.className =
+        'lesson-button' +
+        (
+          selectedLessons.includes(
+            lesson
+          )
+            ? ' selected'
+            : ''
+        );
+
+      button.textContent =
+        lesson;
+
+      button.onclick =
+        () =>
+          toggleLesson(
+            lesson
+          );
+
+      container.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+function toggleLesson(lesson) {
+
+  if (
+    selectedLessons.includes(
+      lesson
+    )
+  ) {
+
+    selectedLessons =
+      selectedLessons.filter(
+        item =>
+          item !== lesson
+      );
+
+  } else {
+
+    selectedLessons.push(
+      lesson
+    );
+
+    selectedLessons.sort(
+      (a, b) => a - b
+    );
+
+  }
+
+
+  renderLessonButtons();
+  updateAvailabilityMessage();
+
+}
+
+
+/* =========================================================
+   VERFÜGBARKEIT IM FORMULAR
+   ========================================================= */
+
+function updateAvailabilityMessage() {
+
+  const box =
+    document.getElementById(
+      'availabilityMessage'
+    );
+
+  const date =
+    document.getElementById(
+      'dateInput'
+    ).value;
+
+  const quantity =
+    Number(
+      document.getElementById(
+        'quantityInput'
+      ).value
+    );
+
+  const id =
+    document.getElementById(
+      'reservationId'
+    ).value || null;
+
+
+  if (
+    !date ||
+    !selectedLessons.length
+  ) {
+
+    box.className =
+      'availability-box good';
+
+    box.textContent =
+      'Datum und mindestens eine Stunde auswählen.';
+
+    return;
+  }
+
+
+  const availabilities =
+    selectedLessons.map(
+      lesson => ({
+        lesson: lesson,
+        available:
+          availableDevices(
+            date,
+            lesson,
+            id
+          )
+      })
+    );
+
+
+  const minimum =
+    Math.min(
+      ...availabilities.map(
+        item => item.available
+      )
+    );
+
+
+  const problems =
+    quantity > 0
+      ? availabilities.filter(
+          item =>
+            quantity >
+            item.available
+        )
+      : [];
+
+
+  if (problems.length) {
+
+    box.className =
+      'availability-box bad';
+
+    box.textContent =
+      problems
+        .map(
+          item =>
+            `${item.lesson}. Stunde: nur ${item.available} frei`
+        )
+        .join(' · ');
+
+    return;
+  }
+
+
+  box.className =
+    'availability-box good';
+
+
+  if (
+    selectedLessons.length === 1
+  ) {
+
+    box.textContent =
+      `${minimum} Chromebooks sind in dieser Stunde verfügbar.`;
+
+  } else {
+
+    box.textContent =
+      `In allen gewählten Stunden sind mindestens ${minimum} Chromebooks verfügbar.`;
+
+  }
+
+}
+
+
+function localAvailabilityProblems(
+  data
+) {
+
+  return data.lessons
+    .map(
+      lesson => ({
+        lesson: lesson,
+        available:
+          availableDevices(
+            data.date,
+            lesson,
+            data.id
+          )
+      })
+    )
+    .filter(
+      item =>
+        data.quantity >
+        item.available
+    );
+
+}
+
+
+/* =========================================================
+   DATUM
+   ========================================================= */
+
+function getMonday(date) {
+
+  const result =
+    startOfDay(
+      new Date(date)
+    );
+
+  const day =
+    result.getDay();
+
+  const difference =
+    result.getDate() -
+    day +
+    (
+      day === 0
+        ? -6
+        : 1
+    );
+
+  result.setDate(
+    difference
+  );
+
+  return result;
+
+}
+
+
+function startOfDay(date) {
+
+  const result =
+    new Date(date);
+
+  result.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  return result;
+
+}
+
+
+function toDateString(date) {
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, '0');
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+function formatShortDate(date) {
+
+  return new Intl.DateTimeFormat(
+    'de-DE',
+    {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    }
+  ).format(date);
+
+}
+
+
+function weekdayName(date) {
+
+  return new Intl.DateTimeFormat(
+    'de-DE',
+    {
+      weekday: 'short'
+    }
+  )
+    .format(date)
+    .replace('.', '');
+
+}
+
+
+function isToday(date) {
+
+  return (
+    toDateString(date) ===
+    toDateString(new Date())
+  );
+
+}
+
+
+/* =========================================================
+   DARSTELLUNG
+   ========================================================= */
+
+function availabilityClass(
+  available
+) {
+
+  const ratio =
+    available /
+    Math.max(
+      appData.totalDevices,
+      1
+    );
+
+  if (ratio <= 0.25) {
+    return 'low';
+  }
+
+  if (ratio <= 0.5) {
+    return 'medium';
+  }
+
+  return 'good';
+
+}
+
+
+/* =========================================================
+   FEHLER / UI
+   ========================================================= */
+
+function readableError(error) {
+
+  if (!error) {
+    return 'Unbekannter Fehler.';
+  }
+
+  let message =
+    error.message ||
+    String(error);
+
+  message =
+    message.replace(
+      /^Exception:\s*/i,
+      ''
+    );
+
+  return message;
+
+}
+
+
+function setLoading(show) {
+
+  document
+    .getElementById('loading')
+    .classList.toggle(
+      'hidden',
+      !show
+    );
+
+}
+
+
+let toastTimer;
+
+
+function showToast(message) {
+
+  const toast =
+    document.getElementById(
+      'toast'
+    );
+
+  toast.textContent =
+    message;
+
+  toast.classList.remove(
+    'hidden'
+  );
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
+    setTimeout(
+      () => {
+
+        toast.classList.add(
+          'hidden'
+        );
+
+      },
+      4500
+    );
+
+}
+
+
+/* =========================================================
+   MODAL AUSSERHALB ANKLICKEN
+   ========================================================= */
+
+document
+  .getElementById(
+    'reservationModal'
+  )
+  .addEventListener(
+    'click',
+    event => {
+
+      if (
+        event.target.id ===
+        'reservationModal'
+      ) {
+        closeModal();
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+</html>
